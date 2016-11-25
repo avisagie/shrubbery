@@ -17,6 +17,15 @@ clone using git:
 git clone https://github.com/avisagie/shrubbery.git
 ```
 
+
+### Get the punkt model
+
+Run `nltk_download.py`, a window will popup that lets you choose to
+download various things, models among them.
+
+Download the punkt model.
+
+
 ### Environment
 
 You need python. On Linux it's easy. On Windows, install the Anaconda python distribution. Then it's easy.
