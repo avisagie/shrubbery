@@ -40,6 +40,9 @@ abbreviations = [
 
     'st.',
     'St.',
+
+    'tel.',
+    'nr.',
 ]
 
 # Spot abbreviations like A.B.C.
