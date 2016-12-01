@@ -1,6 +1,8 @@
 import os
 import nltk
 import re
+import gzip
+import sys
 
 # these are simply stripped of their .
 # Find them using abbrs.py
@@ -43,6 +45,9 @@ abbreviations = [
 
     'tel.',
     'nr.',
+    
+    'ens.',
+    'bv.',
 ]
 
 # Spot abbreviations like A.B.C.
@@ -79,9 +84,14 @@ preproc_replacements = [
 def process(filename):
     # TODO ponder removing accents e.g. nié
     # break them into sentences
-    with open(filename) as fid:
-        text = fid.read()
+    if filename.endswith('.txt'):
+        with open(filename, 'rb') as fid:
+            text = fid.read()
+    elif filename.endswith('.gz'):
+        with gzip.open(filename) as fid:
+            text = fid.read()
 
+    text = text.decode('latin-1', errors='replace')
     print(len(text), 'characters of text')
 
     # Replace all known common abbreviations. This is horribly
@@ -98,10 +108,11 @@ def process(filename):
     sentence_detector = nltk.data.load('tokenizers/punkt/english.pickle')
     sentences = sentence_detector.tokenize(text)    
     print(len(sentences), 'sentences')
+    sys.stdout.flush()
 
-    nie_fids = [open(filename + '.' + str(x+1) + '.nie', 'w') for x in range(0,4)]
+    nie_fids = [open(filename + '.' + str(x+1) + '.nie', 'w', encoding='utf-8') for x in range(0,4)]
     
-    with open(filename+'.sentences', 'w') as fid_sentences:
+    with open(filename+'.sentences', 'w', encoding='utf-8') as fid_sentences:
         # find those with nie, count them
         # TODO deal with nooit, niks, geen etc.
         nie = re.compile(r'([^A-Za-z])(' + "|".join(nie_words) + ')(?=[^A-Za-z-])', re.IGNORECASE)
@@ -125,10 +136,12 @@ def process(filename):
 final_token_counts = {}
 for path, dirs, files in os.walk('./data/'):
     for fn in files:
-        if fn.lower().endswith('.txt'):
+        if fn.lower().endswith('.txt') or fn.lower().endswith('.txt.gz'):
             fullname = os.path.join(path, fn)
             print('processing', fullname)
+            sys.stdout.flush()
             final_tokens = process(fullname)
+            sys.stdout.flush()
 
 
 print("press enter to exit")
